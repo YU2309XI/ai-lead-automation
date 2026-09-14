@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Sarah Miller",
+    "company": "BrightPath Dental",
+    "email": "sarah@brightpath-dental.com",
+    "message": "We need someone to automate our weekly sales reports. Right now our front desk exports four CSV files from the booking system every Friday and combines them by hand in Excel. It takes about three hours and we keep finding mistakes. Budget is around $800 if that is realistic."
+  },
+  {
+    "name": "Tomas Lindqvist",
+    "company": "Nordkap Outdoor",
+    "email": "tomas@nordkap-outdoor.se",
+    "message": "Our Shopify store needs to push new orders into Google Sheets and send a Slack alert when inventory for a product drops under 10 units. We tried Zapier but the task volume got expensive. Can you build this with n8n instead? We would like it running this month."
+  },
+  {
+    "name": "Priya Nair",
+    "company": "Ledgerline Accounting",
+    "email": "p.nair@ledgerline.co.uk",
+    "message": "We receive around 200 supplier invoices as PDFs each month and someone retypes them into our spreadsheet. Looking for an automated way to extract the line items and flag anything that does not match the purchase order."
+  },
+  {
+    "name": "Dan Whitfield",
+    "company": "Whitfield Realty",
+    "email": "dan@whitfieldrealty.com",
+    "message": "Hi, I want an AI assistant that reads our info@ inbox, works out which emails are genuine buyer enquiries, pulls out the name, phone number and property of interest, and drops them into our CRM. Spam should be ignored. Urgent, we are losing leads."
+  },
+  {
+    "name": "Marco Ferretti",
+    "company": "",
+    "email": "marco.f.design@gmail.com",
+    "message": "Hey, do you build websites?"
+  },
+  {
+    "name": "Growth Team",
+    "company": "RankBoost Media",
+    "email": "outreach@rankboostmedia.biz",
+    "message": "We are a leading SEO services agency and can get your site to page one with high quality backlinks and guest post placements. Reply to claim your free audit. Unsubscribe here."
+  },
+  {
+    "name": "Hannah Okafor",
+    "company": "Verdant Labs",
+    "email": "hannah@verdantlabs.io",
+    "message": "We would like to connect our HubSpot CRM with our internal Postgres database so that deal stage changes sync both ways through a webhook. Needs to handle retries properly. We have technical people internally but no capacity."
+  },
+  {
+    "name": "Kenji Watanabe",
+    "company": "Aozora Trading",
+    "email": "k.watanabe@aozora-trading.jp",
+    "message": "Thinking about doing something with AI next year. Not sure what yet. What do you offer?"
+  }
+]

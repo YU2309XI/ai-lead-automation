@@ -1,0 +1,157 @@
+{
+  "name": "AI Lead Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1000000-0000-4000-8000-000000000001",
+      "name": "Incoming Lead",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-360, 300],
+      "webhookId": "a1000000-0000-4000-8000-000000000001"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/classify",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body || $json) }}",
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "a1000000-0000-4000-8000-000000000002",
+      "name": "Qualify With AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-140, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Flatten the classifier response and stamp a received time.\n// Google Sheets needs a flat object with stable keys.\nreturn items.map((item) => {\n  const lead = item.json || {};\n  return {\n    json: {\n      received_at: new Date().toISOString(),\n      name: lead.name || '',\n      company: lead.company || '',\n      email: lead.email || '',\n      category: lead.category || 'Other',\n      priority: lead.priority || 'Medium',\n      lead_quality: lead.lead_quality || 'Needs Review',\n      budget_hint: lead.budget_hint || '',\n      summary: lead.summary || '',\n      suggested_reply: lead.suggested_reply || '',\n      message: lead.message || ''\n    }\n  };\n});"
+      },
+      "id": "a1000000-0000-4000-8000-000000000003",
+      "name": "Shape Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [80, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1000000-0000-4000-8000-000000000001",
+              "leftValue": "={{ $json.lead_quality }}",
+              "rightValue": "Unqualified",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1000000-0000-4000-8000-000000000004",
+      "name": "Drop Spam",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_YOUR_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Leads",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "matchingColumns": [],
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "a1000000-0000-4000-8000-000000000005",
+      "name": "Append To Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [540, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Unqualified leads are logged but never written to the lead sheet.\nreturn items.map((item) => ({\n  json: {\n    skipped: true,\n    reason: 'Classified as Unqualified',\n    email: item.json.email || '',\n    summary: item.json.summary || ''\n  }\n}));"
+      },
+      "id": "a1000000-0000-4000-8000-000000000006",
+      "name": "Log Rejected",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [540, 420]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "a1000000-0000-4000-8000-000000000007",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [780, 300]
+    }
+  ],
+  "connections": {
+    "Incoming Lead": {
+      "main": [[{ "node": "Qualify With AI", "type": "main", "index": 0 }]]
+    },
+    "Qualify With AI": {
+      "main": [[{ "node": "Shape Row", "type": "main", "index": 0 }]]
+    },
+    "Shape Row": {
+      "main": [[{ "node": "Drop Spam", "type": "main", "index": 0 }]]
+    },
+    "Drop Spam": {
+      "main": [
+        [{ "node": "Append To Google Sheets", "type": "main", "index": 0 }],
+        [{ "node": "Log Rejected", "type": "main", "index": 0 }]
+      ]
+    },
+    "Append To Google Sheets": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    },
+    "Log Rejected": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
