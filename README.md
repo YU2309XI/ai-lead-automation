@@ -95,18 +95,51 @@ Endpoints: `GET /health`, `POST /classify`, `POST /classify/batch`.
 
 ## Import the n8n workflow
 
-1. In n8n, **Workflows → Import from File** and choose
+1. In n8n, open a workflow and use **Import from File** to load
    `n8n/ai-lead-automation.workflow.json`.
-2. Open **Append To Google Sheets**, connect your Google account and replace
+2. Open **Qualify With AI** and set the URL to match how n8n is running:
+
+   | How n8n runs | URL to use |
+   |---|---|
+   | Docker | `http://host.docker.internal:8000/classify` |
+   | `npx n8n` or a native install | `http://127.0.0.1:8000/classify` |
+   | n8n Cloud | a public tunnel to the service, e.g. ngrok |
+
+3. Open **Append To Google Sheets**, connect your Google account and replace
    `REPLACE_WITH_YOUR_SHEET_ID` with your spreadsheet ID. The target tab is `Leads`.
-3. Check the URL in **Qualify With AI**. It ships as
-   `http://host.docker.internal:8000/classify`, which is what a Dockerised n8n needs
-   to reach a service on the host. If n8n runs natively, use `http://localhost:8000/classify`.
-4. Activate the workflow and POST a lead to the webhook URL.
+4. Start the classifier service, click **Execute workflow**, and POST a lead to the
+   test webhook URL shown on the **Incoming Lead** node.
 
 To trigger from a real mailbox instead, swap the **Incoming Lead** webhook for a Gmail
 Trigger node and map the sender and body onto `name`, `email` and `message`. Nothing
 downstream changes.
+
+### Use 127.0.0.1, not localhost
+
+On a self-hosted n8n this is the failure worth knowing about in advance. Node resolves
+`localhost` to the IPv6 address `::1` first, while the classifier binds `0.0.0.0`, which
+is IPv4 only. The request never arrives and n8n reports:
+
+```
+The service refused the connection - perhaps it is offline
+```
+
+The message points at the service being down, so it is easy to spend a while checking a
+service that is running fine. `curl localhost:8000/health` succeeds throughout, because
+curl falls back to IPv4 and Node does not. Writing `127.0.0.1` explicitly avoids the
+whole question.
+
+### Docker on Colima
+
+`host.docker.internal` is provided automatically by Docker Desktop but not by Colima.
+Add it at startup:
+
+```bash
+docker run -it --rm -p 5678:5678 \
+  -v n8n_data:/home/node/.n8n \
+  --add-host=host.docker.internal:host-gateway \
+  docker.n8n.io/n8nio/n8n
+```
 
 ## Design notes
 

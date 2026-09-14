@@ -12,7 +12,10 @@
       "name": "Incoming Lead",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [-360, 300],
+      "position": [
+        -360,
+        300
+      ],
       "webhookId": "a1000000-0000-4000-8000-000000000001"
     },
     {
@@ -36,7 +39,12 @@
       "name": "Qualify With AI",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [-140, 300]
+      "position": [
+        -140,
+        300
+      ],
+      "notes": "Docker n8n: http://host.docker.internal:8000/classify  |  npx / native n8n: http://127.0.0.1:8000/classify  (use 127.0.0.1, not localhost)",
+      "notesInFlow": true
     },
     {
       "parameters": {
@@ -46,7 +54,10 @@
       "name": "Shape Row",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [80, 300]
+      "position": [
+        80,
+        300
+      ]
     },
     {
       "parameters": {
@@ -76,7 +87,10 @@
       "name": "Drop Spam",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [300, 300]
+      "position": [
+        300,
+        300
+      ]
     },
     {
       "parameters": {
@@ -102,7 +116,12 @@
       "name": "Append To Google Sheets",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [540, 200]
+      "position": [
+        540,
+        200
+      ],
+      "notes": "Set your own spreadsheet ID and connect a Google account.",
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -112,7 +131,10 @@
       "name": "Log Rejected",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [540, 420]
+      "position": [
+        540,
+        420
+      ]
     },
     {
       "parameters": {
@@ -124,30 +146,85 @@
       "name": "Respond",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [780, 300]
+      "position": [
+        780,
+        300
+      ]
     }
   ],
   "connections": {
     "Incoming Lead": {
-      "main": [[{ "node": "Qualify With AI", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Qualify With AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Qualify With AI": {
-      "main": [[{ "node": "Shape Row", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Shape Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Shape Row": {
-      "main": [[{ "node": "Drop Spam", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Drop Spam",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Drop Spam": {
       "main": [
-        [{ "node": "Append To Google Sheets", "type": "main", "index": 0 }],
-        [{ "node": "Log Rejected", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Append To Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Append To Google Sheets": {
-      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Log Rejected": {
-      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
